@@ -4,6 +4,7 @@ var app = new Vue({
     brand: "Vue Mastery",
     product: "Socks",
     description: "great",
+    onSale: false,
     selectedVariant: 0,
     inventory: 0,
     details: ["80% cotton", "20% polyester", "only men"],
@@ -41,6 +42,9 @@ var app = new Vue({
     },
     inStock() {
       return this.variants[this.selectedVariant].variantQuantity;
+    },
+    print() {
+      return this.brand + " " + this.product;
     },
   },
 });
