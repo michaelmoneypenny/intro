@@ -36,14 +36,13 @@ Vue.component("product", {
     ></div>
     <button
       @click="addToCart"
-      :disabled="inventory === 0"
-      :class="{disabledButton: inStock}"
+      :disabled="inStock > 0"
+      :class="{disabledButton: inStock > 0}"
     >
       Add to cart
     </button>
-    <div class="cart">
-      <p>{{cart}}</p>
-    </div>
+    <button @click="removeFromCart">Remove</button>
+
   </div>
 </div>`,
   data() {
@@ -54,7 +53,6 @@ Vue.component("product", {
       selectedVariant: 0,
       inventory: 0,
       details: ["80% cotton", "20% polyester", "only men"],
-      cart: 0,
       variants: [
         {
           variantId: 2234,
@@ -73,8 +71,15 @@ Vue.component("product", {
   },
   methods: {
     addToCart: function () {
-      this.cart++;
+      this.$emit("add-to-cart", this.variants[this.selectedVariant].variantId);
     },
+    removeFromCart: function () {
+      this.$emit(
+        "remove-from-cart",
+        this.variants[this.selectedVariant].variantId
+      );
+    },
+
     updateProduct: function (index) {
       this.selectedVariant = index;
     },
@@ -103,5 +108,14 @@ var app = new Vue({
   el: "#app",
   data: {
     premium: true,
+    cart: [],
+  },
+  methods: {
+    updateCart(id) {
+      this.cart.push(id);
+    },
+    removeCart(id) {
+      this.cart.splice(this.cart.indexOf(id), 1);
+    },
   },
 });
