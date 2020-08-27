@@ -1,3 +1,5 @@
+var eventBus = new Vue();
+
 Vue.component("product-review", {
   template: `
   <form class="review-form" @submit.prevent="onSubmit">
@@ -50,7 +52,8 @@ Vue.component("product-review", {
           review: this.review,
           rating: this.rating,
         };
-        this.$emit("review-submitted", productReview);
+        eventBus.$emit("review-submitted", productReview);
+
         (this.name = null), (this.review = null), (this.rating = null);
       } else {
         if (!this.name) this.errors.push("name required");
@@ -67,7 +70,8 @@ Vue.component("product-tabs", {
       type: Array,
       required: true,
     },
-    template: `
+  },
+  template: `
   <div>
     <span class="tab" :class="{activeTab: selectedTab === tab}"
      v-for="(tab, index) in tabs"
@@ -75,7 +79,8 @@ Vue.component("product-tabs", {
        @click="selectedTab = tab">
     {{tab}}
     </span>
-    <div>
+
+    <div v-show="selectedTab === 'Reviews'">
 
 
     <h2>Reviews</h2>
@@ -90,15 +95,14 @@ Vue.component("product-tabs", {
     </div>
     
 
-<product-review @review-submitted="reviewSubmitted"></product-review>
+<product-review v-show="selectedTab === 'Make a review'"></product-review>
   </div>`,
 
-    data() {
-      return {
-        tabs: ["Reviews", "Make a review"],
-        selectedTab: "Reviews",
-      };
-    },
+  data() {
+    return {
+      tabs: ["Reviews", "Make a review"],
+      selectedTab: "Reviews",
+    };
   },
 });
 
@@ -191,10 +195,6 @@ Vue.component("product", {
     updateProduct: function (index) {
       this.selectedVariant = index;
     },
-    reviewSubmitted: function (review) {
-      this.reviews.push(review);
-      console.log(review);
-    },
   },
   // computeds are cached so more performant if data may stay the same for a period of time
   computed: {
@@ -214,6 +214,12 @@ Vue.component("product", {
         return "£2:99";
       }
     },
+  },
+  mounted() {
+    eventBus.$on("review-submitted", (productReview) => {
+      this.reviews.push(productReview);
+      console.log("review submitted", this.reviews);
+    });
   },
 });
 var app = new Vue({
